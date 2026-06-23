@@ -1,253 +1,269 @@
 import React, { useState } from "react";
 
 function App() {
-  const [employee, setEmployee] = useState("");
-  const [reason, setReason] = useState("");
-  const [filter, setFilter] = useState("");
-  const [leaves, setLeaves] = useState([]);
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("");
+  const [type, setType] = useState("Income");
+  const [transactions, setTransactions] = useState([]);
 
-  const applyLeave = () => {
-    if (!employee || !reason) {
-      alert("Please fill all fields");
+  const addTransaction = () => {
+    if (!amount || !category) {
+      alert("Please fill all fields!");
       return;
     }
 
-    const newLeave = {
+    const newTransaction = {
       id: Date.now(),
-      employee,
-      reason,
-      status: "Pending",
+      amount: Number(amount),
+      category,
+      type,
+      date: new Date().toLocaleDateString(),
     };
 
-    setLeaves([...leaves, newLeave]);
-    setEmployee("");
-    setReason("");
+    setTransactions([newTransaction, ...transactions]);
+    setAmount("");
+    setCategory("");
   };
 
-  const updateStatus = (id, status) => {
-    setLeaves(
-      leaves.map((leave) =>
-        leave.id === id ? { ...leave, status } : leave
-      )
-    );
+  const deleteTransaction = (id) => {
+    setTransactions(transactions.filter((t) => t.id !== id));
   };
 
-  const filteredLeaves = leaves.filter((leave) =>
-    leave.employee.toLowerCase().includes(filter.toLowerCase())
-  );
+  const income = transactions
+    .filter((t) => t.type === "Income")
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const expense = transactions
+    .filter((t) => t.type === "Expense")
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const balance = income - expense;
+
+  const categorySummary = {};
+
+  transactions.forEach((t) => {
+    categorySummary[t.category] =
+      (categorySummary[t.category] || 0) + t.amount;
+  });
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "linear-gradient(135deg,#667eea,#764ba2,#6dd5ed)",
         padding: "30px",
-        fontFamily: "Segoe UI",
+        background:
+          "linear-gradient(135deg,#667eea 0%,#764ba2 100%)",
+        fontFamily: "Poppins, sans-serif",
       }}
     >
-      <div
+      <h1
         style={{
-          maxWidth: "1100px",
-          margin: "auto",
-          background: "#fff",
-          borderRadius: "20px",
-          padding: "25px",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.3)",
+          textAlign: "center",
+          color: "white",
+          marginBottom: "30px",
         }}
       >
-        <h1
-          style={{
-            textAlign: "center",
-            color: "#333",
-            marginBottom: "25px",
-          }}
+        💰 Daily Expense Analytics Dashboard
+      </h1>
+
+      {/* Form */}
+      <div
+        style={{
+          maxWidth: "600px",
+          margin: "auto",
+          background: "#fff",
+          padding: "25px",
+          borderRadius: "15px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+        }}
+      >
+        <input
+          type="number"
+          placeholder="Enter Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          style={inputStyle}
+        />
+
+        <input
+          type="text"
+          placeholder="Category (Food, Travel...)"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          style={inputStyle}
+        />
+
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          style={inputStyle}
         >
-          🏢 HR Employee Leave Management Tool
-        </h1>
+          <option>Income</option>
+          <option>Expense</option>
+        </select>
 
-        <div
-          style={{
-            background: "#f5f7ff",
-            padding: "20px",
-            borderRadius: "15px",
-            marginBottom: "20px",
-          }}
-        >
-          <h2>📝 Apply Leave</h2>
+        <button onClick={addTransaction} style={buttonStyle}>
+          ➕ Add Transaction
+        </button>
+      </div>
 
-          <input
-            type="text"
-            placeholder="Employee Name"
-            value={employee}
-            onChange={(e) => setEmployee(e.target.value)}
-            style={inputStyle}
-          />
-
-          <input
-            type="text"
-            placeholder="Leave Reason"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            style={inputStyle}
-          />
-
-          <button
-            onClick={applyLeave}
-            style={applyBtn}
-          >
-            Apply Leave
-          </button>
+      {/* Cards */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "20px",
+          marginTop: "30px",
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ ...cardStyle, background: "#d4fc79" }}>
+          <h3>💵 Income</h3>
+          <h2>₹{income}</h2>
         </div>
 
-        <div style={{ marginBottom: "20px" }}>
-          <input
-            type="text"
-            placeholder="🔍 Search Employee"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            style={{
-              ...inputStyle,
-              width: "300px",
-            }}
-          />
+        <div style={{ ...cardStyle, background: "#ff9a9e" }}>
+          <h3>💸 Expense</h3>
+          <h2>₹{expense}</h2>
         </div>
 
-        <h2>📋 Leave History</h2>
+        <div style={{ ...cardStyle, background: "#84fab0" }}>
+          <h3>🏦 Balance</h3>
+          <h2>₹{balance}</h2>
+        </div>
+      </div>
 
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            overflow: "hidden",
-          }}
-        >
-          <thead>
-            <tr
-              style={{
-                background: "#667eea",
-                color: "white",
-              }}
-            >
-              <th style={thStyle}>Employee</th>
-              <th style={thStyle}>Reason</th>
-              <th style={thStyle}>Status</th>
-              <th style={thStyle}>Action</th>
-            </tr>
-          </thead>
+      {/* Transactions */}
+      <div
+        style={{
+          marginTop: "30px",
+          background: "#fff",
+          borderRadius: "15px",
+          padding: "20px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+        }}
+      >
+        <h2>📋 Transaction History</h2>
 
-          <tbody>
-            {filteredLeaves.map((leave) => (
-              <tr key={leave.id}>
-                <td style={tdStyle}>{leave.employee}</td>
-                <td style={tdStyle}>{leave.reason}</td>
-
-                <td style={tdStyle}>
-                  <span
-                    style={{
-                      padding: "6px 12px",
-                      borderRadius: "20px",
-                      color: "white",
-                      background:
-                        leave.status === "Approved"
-                          ? "green"
-                          : leave.status === "Rejected"
-                          ? "red"
-                          : "orange",
-                    }}
-                  >
-                    {leave.status}
-                  </span>
-                </td>
-
-                <td style={tdStyle}>
-                  <button
-                    onClick={() =>
-                      updateStatus(
-                        leave.id,
-                        "Approved"
-                      )
-                    }
-                    style={approveBtn}
-                  >
-                    Approve
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      updateStatus(
-                        leave.id,
-                        "Rejected"
-                      )
-                    }
-                    style={rejectBtn}
-                  >
-                    Reject
-                  </button>
-                </td>
+        {transactions.length === 0 ? (
+          <p>No Transactions Yet</p>
+        ) : (
+          <table width="100%" cellPadding="10">
+            <thead>
+              <tr style={{ background: "#764ba2", color: "white" }}>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
 
-        <div
-          style={{
-            marginTop: "25px",
-            textAlign: "center",
-            color: "#666",
-          }}
-        >
-          Total Leave Requests: {leaves.length}
-        </div>
+            <tbody>
+              {transactions.map((t) => (
+                <tr key={t.id}>
+                  <td>{t.date}</td>
+                  <td>{t.type}</td>
+                  <td>{t.category}</td>
+                  <td>₹{t.amount}</td>
+                  <td>
+                    <button
+                      onClick={() => deleteTransaction(t.id)}
+                      style={{
+                        background: "red",
+                        color: "white",
+                        border: "none",
+                        padding: "6px 12px",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Category Analytics */}
+      <div
+        style={{
+          marginTop: "30px",
+          background: "#fff",
+          borderRadius: "15px",
+          padding: "20px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+        }}
+      >
+        <h2>📊 Category Analytics</h2>
+
+        {Object.keys(categorySummary).length === 0 ? (
+          <p>No Data Available</p>
+        ) : (
+          Object.keys(categorySummary).map((cat) => (
+            <div key={cat} style={{ marginBottom: "15px" }}>
+              <strong>{cat}</strong>
+
+              <div
+                style={{
+                  height: "20px",
+                  background: "#ddd",
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                  marginTop: "5px",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${Math.min(
+                      categorySummary[cat] / 10,
+                      100
+                    )}%`,
+                    background:
+                      "linear-gradient(to right,#36d1dc,#5b86e5)",
+                    height: "100%",
+                  }}
+                ></div>
+              </div>
+
+              <p>₹{categorySummary[cat]}</p>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
 }
 
 const inputStyle = {
+  width: "100%",
   padding: "12px",
-  margin: "8px",
-  borderRadius: "10px",
+  marginBottom: "12px",
+  borderRadius: "8px",
   border: "1px solid #ccc",
-  width: "250px",
+  fontSize: "16px",
 };
 
-const applyBtn = {
-  padding: "12px 20px",
-  background: "#667eea",
+const buttonStyle = {
+  width: "100%",
+  padding: "12px",
+  background: "#764ba2",
   color: "white",
   border: "none",
-  borderRadius: "10px",
-  cursor: "pointer",
-};
-
-const approveBtn = {
-  background: "green",
-  color: "white",
-  border: "none",
-  padding: "8px 12px",
   borderRadius: "8px",
   cursor: "pointer",
-  marginRight: "5px",
+  fontSize: "16px",
 };
 
-const rejectBtn = {
-  background: "red",
-  color: "white",
-  border: "none",
-  padding: "8px 12px",
-  borderRadius: "8px",
-  cursor: "pointer",
-};
-
-const thStyle = {
-  padding: "12px",
-};
-
-const tdStyle = {
-  padding: "12px",
+const cardStyle = {
+  padding: "20px",
+  borderRadius: "15px",
+  minWidth: "220px",
   textAlign: "center",
-  borderBottom: "1px solid #ddd",
+  boxShadow: "0 5px 15px rgba(0,0,0,0.2)",
 };
 
 export default App;

@@ -1,273 +1,253 @@
 import React, { useState } from "react";
 
 function App() {
-  const [transactions, setTransactions] = useState([]);
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
-  const [type, setType] = useState("Income");
+  const [employee, setEmployee] = useState("");
+  const [reason, setReason] = useState("");
+  const [filter, setFilter] = useState("");
+  const [leaves, setLeaves] = useState([]);
 
-  const addTransaction = () => {
-    if (amount === "" || category === "") {
+  const applyLeave = () => {
+    if (!employee || !reason) {
       alert("Please fill all fields");
       return;
     }
 
-    const newTransaction = {
+    const newLeave = {
       id: Date.now(),
-      amount: Number(amount),
-      category,
-      type,
+      employee,
+      reason,
+      status: "Pending",
     };
 
-    setTransactions([...transactions, newTransaction]);
-    setAmount("");
-    setCategory("");
+    setLeaves([...leaves, newLeave]);
+    setEmployee("");
+    setReason("");
   };
 
-  const totalIncome = transactions
-    .filter((item) => item.type === "Income")
-    .reduce((sum, item) => sum + item.amount, 0);
+  const updateStatus = (id, status) => {
+    setLeaves(
+      leaves.map((leave) =>
+        leave.id === id ? { ...leave, status } : leave
+      )
+    );
+  };
 
-  const totalExpense = transactions
-    .filter((item) => item.type === "Expense")
-    .reduce((sum, item) => sum + item.amount, 0);
-
-  const balance = totalIncome - totalExpense;
+  const filteredLeaves = leaves.filter((leave) =>
+    leave.employee.toLowerCase().includes(filter.toLowerCase())
+  );
 
   return (
     <div
       style={{
         minHeight: "100vh",
         background:
-          "linear-gradient(to right, #4facfe 0%, #00f2fe 100%)",
+          "linear-gradient(135deg,#667eea,#764ba2,#6dd5ed)",
         padding: "30px",
-        fontFamily: "Segoe UI, sans-serif",
+        fontFamily: "Segoe UI",
       }}
     >
-      <h1
-        style={{
-          textAlign: "center",
-          color: "white",
-          marginBottom: "25px",
-        }}
-      >
-        💰 Daily Expense Analytics Dashboard
-      </h1>
-
-      {/* Input Section */}
       <div
         style={{
-          background: "#fff",
-          padding: "25px",
-          borderRadius: "15px",
-          width: "85%",
+          maxWidth: "1100px",
           margin: "auto",
-          textAlign: "center",
-          boxShadow: "0px 5px 15px rgba(0,0,0,0.2)",
-        }}
-      >
-        <input
-          type="number"
-          placeholder="Enter Amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          style={{
-            padding: "12px",
-            margin: "8px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-            width: "180px",
-          }}
-        />
-
-        <input
-          type="text"
-          placeholder="Enter Category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          style={{
-            padding: "12px",
-            margin: "8px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-            width: "180px",
-          }}
-        />
-
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          style={{
-            padding: "12px",
-            margin: "8px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-          }}
-        >
-          <option>Income</option>
-          <option>Expense</option>
-        </select>
-
-        <button
-          onClick={addTransaction}
-          style={{
-            padding: "12px 22px",
-            margin: "8px",
-            background: "#28a745",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
-        >
-          ➕ Add Transaction
-        </button>
-      </div>
-
-      {/* Summary Cards */}
-      <div
-        style={{
-          width: "85%",
-          margin: "20px auto",
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "15px",
-          flexWrap: "wrap",
-        }}
-      >
-        <div
-          style={{
-            flex: 1,
-            minWidth: "220px",
-            background: "#d4edda",
-            padding: "20px",
-            borderRadius: "15px",
-            textAlign: "center",
-            boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h3>💵 Income</h3>
-          <h2>₹{totalIncome}</h2>
-        </div>
-
-        <div
-          style={{
-            flex: 1,
-            minWidth: "220px",
-            background: "#f8d7da",
-            padding: "20px",
-            borderRadius: "15px",
-            textAlign: "center",
-            boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h3>💸 Expense</h3>
-          <h2>₹{totalExpense}</h2>
-        </div>
-
-        <div
-          style={{
-            flex: 1,
-            minWidth: "220px",
-            background: "#d1ecf1",
-            padding: "20px",
-            borderRadius: "15px",
-            textAlign: "center",
-            boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h3>🏦 Balance</h3>
-          <h2>₹{balance}</h2>
-        </div>
-      </div>
-
-      {/* Transaction Table */}
-      <div
-        style={{
           background: "#fff",
-          width: "85%",
-          margin: "20px auto",
-          padding: "20px",
-          borderRadius: "15px",
-          boxShadow: "0px 5px 15px rgba(0,0,0,0.2)",
+          borderRadius: "20px",
+          padding: "25px",
+          boxShadow: "0 10px 25px rgba(0,0,0,0.3)",
         }}
       >
-        <h2>📋 Transaction List</h2>
+        <h1
+          style={{
+            textAlign: "center",
+            color: "#333",
+            marginBottom: "25px",
+          }}
+        >
+          🏢 HR Employee Leave Management Tool
+        </h1>
+
+        <div
+          style={{
+            background: "#f5f7ff",
+            padding: "20px",
+            borderRadius: "15px",
+            marginBottom: "20px",
+          }}
+        >
+          <h2>📝 Apply Leave</h2>
+
+          <input
+            type="text"
+            placeholder="Employee Name"
+            value={employee}
+            onChange={(e) => setEmployee(e.target.value)}
+            style={inputStyle}
+          />
+
+          <input
+            type="text"
+            placeholder="Leave Reason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            style={inputStyle}
+          />
+
+          <button
+            onClick={applyLeave}
+            style={applyBtn}
+          >
+            Apply Leave
+          </button>
+        </div>
+
+        <div style={{ marginBottom: "20px" }}>
+          <input
+            type="text"
+            placeholder="🔍 Search Employee"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            style={{
+              ...inputStyle,
+              width: "300px",
+            }}
+          />
+        </div>
+
+        <h2>📋 Leave History</h2>
 
         <table
-          width="100%"
           style={{
+            width: "100%",
             borderCollapse: "collapse",
-            textAlign: "center",
+            overflow: "hidden",
           }}
         >
           <thead>
-            <tr style={{ background: "#007bff", color: "white" }}>
-              <th style={{ padding: "12px" }}>Amount</th>
-              <th style={{ padding: "12px" }}>Category</th>
-              <th style={{ padding: "12px" }}>Type</th>
+            <tr
+              style={{
+                background: "#667eea",
+                color: "white",
+              }}
+            >
+              <th style={thStyle}>Employee</th>
+              <th style={thStyle}>Reason</th>
+              <th style={thStyle}>Status</th>
+              <th style={thStyle}>Action</th>
             </tr>
           </thead>
 
           <tbody>
-            {transactions.map((item) => (
-              <tr key={item.id}>
-                <td style={{ padding: "10px" }}>₹{item.amount}</td>
-                <td>{item.category}</td>
-                <td
-                  style={{
-                    color:
-                      item.type === "Income" ? "green" : "red",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {item.type}
+            {filteredLeaves.map((leave) => (
+              <tr key={leave.id}>
+                <td style={tdStyle}>{leave.employee}</td>
+                <td style={tdStyle}>{leave.reason}</td>
+
+                <td style={tdStyle}>
+                  <span
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      color: "white",
+                      background:
+                        leave.status === "Approved"
+                          ? "green"
+                          : leave.status === "Rejected"
+                          ? "red"
+                          : "orange",
+                    }}
+                  >
+                    {leave.status}
+                  </span>
+                </td>
+
+                <td style={tdStyle}>
+                  <button
+                    onClick={() =>
+                      updateStatus(
+                        leave.id,
+                        "Approved"
+                      )
+                    }
+                    style={approveBtn}
+                  >
+                    Approve
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      updateStatus(
+                        leave.id,
+                        "Rejected"
+                      )
+                    }
+                    style={rejectBtn}
+                  >
+                    Reject
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
 
-      {/* Analytics */}
-      <div
-        style={{
-          background: "#fff",
-          width: "85%",
-          margin: "20px auto",
-          padding: "20px",
-          borderRadius: "15px",
-          boxShadow: "0px 5px 15px rgba(0,0,0,0.2)",
-        }}
-      >
-        <h2>📊 Category-wise Analytics</h2>
-
-        {[...new Set(transactions.map((item) => item.category))].map(
-          (cat) => {
-            const total = transactions
-              .filter((item) => item.category === cat)
-              .reduce((sum, item) => sum + item.amount, 0);
-
-            return (
-              <div
-                key={cat}
-                style={{
-                  background: "#f8f9fa",
-                  padding: "12px",
-                  margin: "10px 0",
-                  borderRadius: "8px",
-                  borderLeft: "6px solid #007bff",
-                }}
-              >
-                <b>{cat}</b> : ₹{total}
-              </div>
-            );
-          }
-        )}
+        <div
+          style={{
+            marginTop: "25px",
+            textAlign: "center",
+            color: "#666",
+          }}
+        >
+          Total Leave Requests: {leaves.length}
+        </div>
       </div>
     </div>
   );
 }
+
+const inputStyle = {
+  padding: "12px",
+  margin: "8px",
+  borderRadius: "10px",
+  border: "1px solid #ccc",
+  width: "250px",
+};
+
+const applyBtn = {
+  padding: "12px 20px",
+  background: "#667eea",
+  color: "white",
+  border: "none",
+  borderRadius: "10px",
+  cursor: "pointer",
+};
+
+const approveBtn = {
+  background: "green",
+  color: "white",
+  border: "none",
+  padding: "8px 12px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  marginRight: "5px",
+};
+
+const rejectBtn = {
+  background: "red",
+  color: "white",
+  border: "none",
+  padding: "8px 12px",
+  borderRadius: "8px",
+  cursor: "pointer",
+};
+
+const thStyle = {
+  padding: "12px",
+};
+
+const tdStyle = {
+  padding: "12px",
+  textAlign: "center",
+  borderBottom: "1px solid #ddd",
+};
 
 export default App;
